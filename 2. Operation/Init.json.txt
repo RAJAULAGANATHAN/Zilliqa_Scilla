@@ -1,0 +1,12 @@
+[
+    {
+        "vname" : "oper",
+        "type" : "String", 
+        "value" : "Mul"
+    },
+    {
+        "vname" : "_creation_block",
+        "type" : "BNum",
+        "value" : "0"
+    }
+]
