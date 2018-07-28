@@ -1,0 +1,44 @@
+library Database
+
+let one_msg = 
+  fun (msg : Message) => 
+  let nil_msg = Nil {Message} in
+  Cons {Message} msg nil_msg
+  
+let owner_set = Int32 1
+let not_owner = Int32 2
+
+contract Database
+(owner:Address,nmm : String, agg  :Uint32)
+
+
+field mm :  Map String Uint32  =
+  let m = Emp  String Uint32  in
+     builtin put m nmm agg
+    
+transition set_DB(_name:String,_age:Uint32)
+owner_check = builtin eq owner _sender;
+
+       bl <- mm;
+       
+      val = builtin get bl _name;
+       match val with
+  | Some v =>
+    msg = { _tag : "Main"; _recipient : _sender; _amount : Uint128 0; age : v };
+    msgs = one_msg msg;
+    send msgs
+  | None =>
+    msg = { _tag : "Main"; _recipient : _sender; _amount : Uint128 0; bal : Uint128 0 };
+    msgs = one_msg msg;
+    send msgs
+  end
+  end
+     
+   
+
+
+
+
+    
+    
+
