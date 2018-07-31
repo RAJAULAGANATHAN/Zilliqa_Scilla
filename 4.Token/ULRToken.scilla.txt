@@ -1,0 +1,126 @@
+library ULRToken
+
+let one_msg = 
+  fun (msg : Message) => 
+  let nil_msg = Nil {Message} in
+  Cons {Message} msg nil_msg
+
+let no_msg = Nil {Message}
+
+
+
+let lessthan_check =
+  fun (a : Uint128) => fun (b : Uin128) =>
+    let x = builtin lt a b in
+    match x with
+    | True => True
+    | False =>
+      let y = builtin eq a b in
+      match y with
+      | True => True
+      | False => False
+      end
+    end
+    
+    
+    
+contract ULRToken
+(owner:Address,
+total_Supply:Uint128)
+
+
+
+field balance_set : Map Address Uint128 = 
+    let m = Emp Address Uint128 in
+    builtin put  m owner total_Supply
+
+
+
+  
+transition balanceOf(token_Holder : Address)
+
+        b1 <- balance_set;
+        k = builtin  get b1 token_Holder;
+         
+        match k with
+            |Some v =>
+              m2 = {_tag:"Balance Of";_recipient:_sender;_amount:Uint128 0;bal:v};
+              m2s = one_msg m2;
+              send m2s
+            
+            |None =>
+              m2 = {_tag:"Balance Of N";_recipient:_sender;_amount:Uint128 0;bal : Uint128 0};
+              m2s = one_msg m2;
+              send m2s
+         end
+end
+   
+   
+   
+
+transition totalSupply()
+            m2 = {_tag:"Total Supply";_recipient:_sender;_amount:Uint128 0;bal:total_Supply};
+            m2s = one_msg m2;
+            send m2s
+end
+
+
+
+transition  transferr(to_Add : Address,amount : Uint128)
+owner_check = builtin eq owner _sender;
+
+match owner_check with
+ |True =>
+   b1<-balance_set;
+   _sender_bal=builtin get b1 _sender;
+
+ match _sender_bal with
+    |Some v1 => 
+        ls_ck = lessthan_check amount v1;
+        
+  match ls_ck with
+      |True=>
+        subbal = builtin sub v1  amount; 
+        new_balance = builtin put  b1  _sender subbal;
+        balance_set:=new_balance;
+        b2<-balance_set;
+        new_balance1 = builtin  get b2 _sender;
+          
+       
+        to_balance1 = builtin get b2 to_Add;
+    match  to_balance1 with
+        |Some v3=>
+            reciever_balance = builtin add v3 amount;
+            to_balance = builtin put  b2  to_Add reciever_balance;
+            balance_set:= to_balance;
+            b3<-balance_set;
+            to_balance2 =  builtin  get b3 to_Add;
+        
+        match  to_balance2  with
+            |Some v2 =>
+               ms = {_tag:"To Balance Updated";_recipient:_sender;_amount:Uint128 0;to_Addresss_Balance:v2};
+               ms1 = one_msg ms;
+               send ms1
+                     
+                 
+        |None=>
+            to_balance = builtin put  b2  to_Add amount;
+            balance_set:= to_balance;
+            b3<-balance_set;
+            to_balance3 =  builtin  get b3 to_Add;
+                      
+        match  to_balance3  with
+              |Some v2 =>
+                 ms = {_tag:"New To Balance";_recipient:_sender;_amount:Uint128 5;to_Addresss_Balance:v2};
+                 ms1 = one_msg ms;
+                 send ms1
+        end
+        end
+    end
+   end    
+  end
+ end
+end
+                   
+         
+         
