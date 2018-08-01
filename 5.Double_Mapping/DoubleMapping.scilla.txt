@@ -30,9 +30,9 @@ match recieve with
         
 
     |None=>
-        allowed_to_spender = let m = Emp String Uint128 in builtin put m _name _age;
-        allowed_new = builtin put bl name allowed_to_spender;
-        mm := allowed_new
+        name_Set = let m = Emp String Uint128 in builtin put m _name _age;
+        name_S = builtin put bl name name_Set;
+        mm := name_S
         end;
 
 
