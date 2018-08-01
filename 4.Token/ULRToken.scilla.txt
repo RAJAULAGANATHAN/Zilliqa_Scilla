@@ -23,6 +23,9 @@ let lessthan_check =
     end
     
     
+
+    
+    
     
 contract ULRToken
 (owner:Address,
@@ -33,7 +36,12 @@ total_Supply:Uint128)
 field balance_set : Map Address Uint128 = 
     let m = Emp Address Uint128 in
     builtin put  m owner total_Supply
-
+    
+    
+    
+field allowance_map :  Map Address (Map Address Uint128)  =
+   Emp  Address (Map Address Uint128)  
+   
 
 
   
@@ -122,5 +130,52 @@ match owner_check with
  end
 end
                    
-         
-         
+
+
+transition approval(_reciverAddr:Address,_amountRange:Uint128)
+am1 <- allowance_map;
+
+allowance_check = builtin get am1 _sender;
+ match allowance_check with
+    |Some v=>
+        set_Allowance = builtin put v _reciverAddr _amountRange;
+        set_Allowance1 = builtin put am1 _sender set_Allowance;
+        allowance_map:=set_Allowance1;
+        send no_msg
+        
+
+   |None=>
+        set_Allowance = let m = Emp Address Uint128 in builtin put m _reciverAddr _amountRange;
+        set_Allowance1 = builtin put am1 _sender set_Allowance;
+        allowance_map := set_Allowance1;
+        send no_msg
+ end
+end
+
+
+transition allowance(_tOwner:Address,_reciverAddr:Address)
+am2<-allowance_map;
+
+allowance_check1 = builtin get am2 _tOwner;
+
+ match allowance_check1 with
+    |Some v1 =>
+        allowance_check2= builtin get am2 _reciverAddr;
+        
+        match allowance_check2 with
+            |Some v2 =>
+                 ms = {_tag:"Allowance";_recipient:_sender;_amount:Uint128 0;allowance_Approved:v2};
+                 mss = one_msg ms;
+                 send mss
+            |None =>
+                ms = {_tag:"Allowance_N";_recipient:_sender;_amount:Uint128 0;allowance_Approved:Uint128 0};
+                mss = one_msg ms;
+                 send mss
+                 
+    |None=>
+        ms1={_tag:"Allowance Not Setted";_recipient:_sender;_amount:Uint128 0};
+        mss1 = one_msg ms1;
+        send mss1
+            end
+ end
+end
