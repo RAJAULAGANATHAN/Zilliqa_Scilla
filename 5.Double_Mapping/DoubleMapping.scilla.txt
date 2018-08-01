@@ -1,0 +1,53 @@
+library Database
+
+let one_msg = 
+  fun (msg : Message) => 
+  let nil_msg = Nil {Message} in
+  Cons {Message} msg nil_msg
+
+
+contract Database
+(owner:Address)
+
+
+field mm :  Map String (Map String Uint128)  =
+   Emp  String (Map String Uint128)  
+   
+  
+    
+transition set_DB(_name:String,_age:Uint128)
+name ="Name";
+
+
+bl <- mm;
+
+recieve = builtin get bl _name;
+match recieve with
+    |Some v=>
+        name_Set = builtin put v _name _age;
+        name_S = builtin put bl name name_Set;
+        mm:=name_S
+        
+
+    |None=>
+        allowed_to_spender = let m = Emp String Uint128 in builtin put m _name _age;
+        allowed_new = builtin put bl name allowed_to_spender;
+        mm := allowed_new
+        end;
+
+
+
+b2<-mm;
+val = builtin get b2 name;
+match val with
+  | Some v =>
+    msg = { _tag : "Value Assigned"; _recipient : _sender; _amount : Uint128 0};
+    msgs = one_msg msg;
+    send msgs
+  | None =>
+    msg = { _tag : "Main"; _recipient : _sender; _amount : Uint128 0; age : Uint128 0 };
+    msgs = one_msg msg;
+    send msgs
+  end
+  end
+    

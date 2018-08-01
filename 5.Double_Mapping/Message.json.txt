@@ -1,0 +1,17 @@
+{
+    "_tag": "set_DB",
+    "_amount": "0",
+    "_sender" : "0x1234567890123456789012345678901234567890",
+    "params": [
+      {
+        "vname": "_name",
+        "type": "String",
+        "value": "Raja"
+      } ,
+      {
+        "vname": "_age",
+        "type": "Uint128",
+        "value": "25"
+      } 
+   ]
+} 
