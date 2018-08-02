@@ -16,6 +16,7 @@ let lessthan_check =
     | True => True
     | False =>
       let y = builtin eq a b in
+      
       match y with
       | True => True
       | False => False
@@ -109,6 +110,7 @@ match owner_check with
                ms = {_tag:"To Balance Updated";_recipient:_sender;_amount:Uint128 0;to_Addresss_Balance:v2};
                ms1 = one_msg ms;
                send ms1
+               end
                      
                  
         |None=>
@@ -128,7 +130,6 @@ match owner_check with
    end    
   end
  end
-end
                    
 
 
@@ -151,6 +152,8 @@ allowance_check = builtin get am1 _sender;
         send no_msg
  end
 end
+
+
 
 
 transition allowance(_tOwner:Address,_reciverAddr:Address)
@@ -177,5 +180,83 @@ allowance_check1 = builtin get am2 _tOwner;
         mss1 = one_msg ms1;
         send mss1
             end
+ end
+end
+
+
+
+
+transition transferFrom(fromAdd:Address,toAdd:Address,tokenVal:Uint128)
+bm1 <- balance_set;
+am1 <- allowance_map;
+
+alwn_check1 = builtin get am1 fromAdd;
+
+match alwn_check1 with
+    |Some v1 =>
+        alwn_check2 = builtin get am1 toAdd;
+        
+        match alwn_check2 with
+            |Some v2 =>
+                conf_check1 = builtin lt tokenVal v2;
+                
+                match conf_check1 with
+                |True=>
+                    bal_check1 = builtin get bm1 fromAdd;
+                    
+                    match bal_check1 with
+                        |Some v3=>
+                            conf_check2 = builtin lt tokenVal v3;
+                            
+                            match conf_check2 with 
+                                |True =>
+                                    frm_Bal1= builtin sub v3 tokenVal;
+                                    frm_Bal2 = builtin put bm1 fromAdd frm_Bal1;
+                                    balance_set:=frm_Bal2;
+                                    bm2 <- balance_set;
+                                    frm_Bal3 = builtin get bm2 fromAdd;
+                                    
+                                    to_Bal1 = builtin get bm2 toAdd;
+                                    
+                                    match to_Bal1 with
+                                        |Some v4=>
+                                            to_Bal2 = builtin add v4 tokenVal;
+                                            to_Bal3 = builtin put bm2 toAdd to_Bal2;
+                                            
+                                            balance_set:=to_Bal3;
+                                            bm3<-balance_set;
+                                            
+                                            to_Bal4 = builtin get bm3 toAdd;
+                                            match to_Bal4 with
+                                                |Some v5 =>
+                                                    tfmsg = {_tag:"TF1";_recipient:_sender;_amount:Uint128 0;to_balance:v5};
+                                                    tfmsg1= one_msg tfmsg;
+                                                    send tfmsg1
+                                                    
+                                        |None=>
+                                            to_Bal5 = builtin put bm2 toAdd tokenVal;
+                                            balance_set:=to_Bal5;
+                                            bm4<-balance_set;
+                                            
+                                            to_Bal6 = builtin get bm4 toAdd;
+                                            match to_Bal6 with
+                                                |Some v6=>
+                                                    tfmsg2 = {_tag:"TF2";_recipient:_sender;_amount:Uint128 0;to_balance1:v6};
+                                                    tfmsg3 = one_msg tfmsg2;
+                                                    send tfmsg3
+                                                    end
+                                                    end
+                                                    end
+                                                    
+                       |None=>
+                           send no_msg
+                           end
+                                                   
+                |False=>
+                    send no_msg
+                    end       
+            end
+        end             
+        
  end
 end
