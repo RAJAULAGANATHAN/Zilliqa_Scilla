@@ -1,0 +1,75 @@
+library Sample
+
+
+let one_msg = 
+  fun (msg : Message) => 
+    let nil_msg = Nil {Message} in
+    Cons {Message} msg nil_msg
+    
+contract Test
+(string1:String,name1:String,age1:Uint128)
+
+
+field outputmsg :String=""
+
+field mm :  Map String Uint128  =
+  let m = Emp  String Uint128  in
+     builtin put m string1 age1
+     
+     
+transition stringequal(string2:String)
+check1 = builtin eq string2 string1;
+match check1 with 
+    |True=>
+        msg1 = {_tag:"String Equal";_recipient:_sender;_amount:Uint128 0};
+        msg2 = one_msg msg1;
+        send msg2
+        end
+    end
+    
+transition stringOperation2(string3: String)
+check2 = builtin concat string3 string1;
+outputmsg:=check2
+
+    end
+    
+    
+transition stringOperation3(string4: String,pos1:Uint32,pos2:Uint32)
+check3 = builtin substr string4 pos1 pos2;
+outputmsg:=check3
+
+    end
+    
+    
+transition mapOperation1(string5:String)
+map1<-mm;
+mapcheck1 = builtin get map1 string5;
+match mapcheck1 with 
+    |Some v1=>
+    msg3 ={_tag:"Get Map Operation";_recipient:_sender;_amount:Uint128 0;value: v1};
+    msg4 = one_msg msg3;
+    send msg4
+    end
+end
+
+
+transition mapOperation2(string6:String)
+map_2<-mm;
+mapcheck2 = builtin contains map_2 string6;
+outputmsg:=mapcheck2
+    end
+    
+    
+transition mapOperation3(string7:String)
+map_3<-mm;
+mapcheck3 =  builtin remove map_3 string7;
+mm:=mapcheck3
+
+end
+
+
+
+
+    
+    
+    
